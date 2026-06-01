@@ -120,7 +120,6 @@ df_cs_staff_numbers.to_sql(
         "quarter": TINYINT,
         "organisation_id": UNIQUEIDENTIFIER,
         "organisation_name": NVARCHAR(200),
-        "departmental_group_survey": NVARCHAR(200),
         "headcount": INT,
         "fte": INT,
         "original": NVARCHAR(20),
