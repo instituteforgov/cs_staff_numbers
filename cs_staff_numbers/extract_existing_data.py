@@ -8,9 +8,9 @@
         - sql: civil_service.organisation
             - Canonical civil service organisation details
     Outputs
-        - sql: civil_service.civil_service_staff_numbers
+        - sql: civil_service.staff_numbers
     Notes
-        - Replaces existing data in `civil_service.civil_service_staff_numbers`
+        - Replaces existing data in `civil_service.staff_numbers`
 """
 
 import os
@@ -18,8 +18,8 @@ import uuid
 
 import ds_utils.database_operations as dbo
 import pandas as pd
-from sqlalchemy import DECIMAL, NVARCHAR, SMALLINT
-from sqlalchemy.dialects.mssql import UNIQUEIDENTIFIER
+from sqlalchemy import INT, NVARCHAR, SMALLINT
+from sqlalchemy.dialects.mssql import TINYINT, UNIQUEIDENTIFIER
 
 from cs_staff_numbers.utils import normalise_column_names, resolve_org_id
 
@@ -109,26 +109,21 @@ df_cs_staff_numbers.insert(
 # SAVE DATA TO DATABASE
 df_cs_staff_numbers.to_sql(
     schema="civil_service",
-    name="civil_service_staff_numbers",
+    name="staff_numbers",
     con=engine,
     if_exists="replace",
     index=False,
     chunksize=1000,
     dtype={
         "id": UNIQUEIDENTIFIER,
-        "headline_category": NVARCHAR(10),
         "year": SMALLINT,
+        "quarter": TINYINT,
         "organisation_id": UNIQUEIDENTIFIER,
-        "organisation_code": NVARCHAR(100),
         "organisation_name": NVARCHAR(200),
         "departmental_group_survey": NVARCHAR(200),
-        "section": NVARCHAR(100),
-        "measure": NVARCHAR(20),
-        "label": NVARCHAR(300),
-        "value": DECIMAL(9, 6),
-        "answer_format": NVARCHAR(200),
-        "based_on": NVARCHAR(200),
-        "notes": NVARCHAR(200),
+        "headcount": INT,
+        "fte": INT,
+        "original": NVARCHAR(20),
     }
 )
 
