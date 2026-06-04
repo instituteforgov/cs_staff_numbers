@@ -58,8 +58,7 @@ select
     end [Latest departmental group],
     sn.original Original,
     sn.headcount Headcount,
-    sn.fte FTE,
-    sn.rn
+    sn.fte FTE
 from sn
     left join o_vicd_vodg on
         sn.organisation_id = o_vicd_vodg.id and
