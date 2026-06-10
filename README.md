@@ -15,7 +15,7 @@ Scripts for managing civil service staff numbers data
 │   │   ├── sql/
 │   │   │   └── compare_data.sql
 │   │   ├── compare_data.py
-│   │   └── extract_existing_data.py
+│   │   └── extract_legacy_data.py
 │   ├── sql/
 │   │   └── select_data.sql
 │   └── utils.py
@@ -44,7 +44,7 @@ These scripts were used to make an initial, one-time extraction of existing coll
 
 | File | Description |
 | ---- | ----------- |
-| `cs_staff_numbers/legacy/extract_existing_data.py` | Reads existing civil service staff numbers data and saves to database. |
+| `cs_staff_numbers/legacy/extract_legacy_data.py` | Reads existing civil service staff numbers data and saves to database. |
 | `cs_staff_numbers/legacy/sql/compare_data.sql` | Replicates the collated data from the civil service staff numbers working file, to be used as the basis for comparison in `compare_data.py`. |
 | `cs_staff_numbers/legacy/compare_data.py` | Validates that the augmented SQL output matches the source Excel file. |
 
