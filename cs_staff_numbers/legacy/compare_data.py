@@ -30,7 +30,7 @@ BASE_PATH = "C:/Users/" + os.getlogin() + "/INSTITUTE FOR GOVERNMENT/Data - Gene
 SHEET_NAME = "Data.Collated staff numbers"
 NA_VALUES = ["-", "..", "N/A"]
 KEY_COLS = ["Year", "Quarter", "Organisation", "Original"]
-SQL_PATH = "C:/Users/" + os.getlogin() + "/INSTITUTE FOR GOVERNMENT/Data - General/Civil service/Civil service - staff numbers (FTE and headcount)/Scripts/cs_staff_numbers/sql/compare_data.sql"
+SQL_PATH = "C:/Users/" + os.getlogin() + "/INSTITUTE FOR GOVERNMENT/Data - General/Civil service/Civil service - staff numbers (FTE and headcount)/Scripts/cs_staff_numbers/legacy/sql/compare_data.sql"
 
 # %%
 # CONNECT TO DATABASE
