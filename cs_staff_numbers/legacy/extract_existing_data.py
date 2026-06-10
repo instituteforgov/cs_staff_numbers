@@ -22,7 +22,7 @@ import pandas as pd
 from sqlalchemy import INT, NVARCHAR, SMALLINT
 from sqlalchemy.dialects.mssql import TINYINT, UNIQUEIDENTIFIER
 
-from cs_staff_numbers.utils import normalise_column_names
+from cs_data_utils.utils import normalise_column_names
 
 # %%
 # SET CONSTANTS
