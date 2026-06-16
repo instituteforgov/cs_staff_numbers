@@ -1,11 +1,11 @@
 # Civil service staff numbers
 
-Scripts for managing civil service staff numbers data
+Scripts for extracting civil service staff numbers data from ONS PSE releases and loading it into the IfG's research database.
 
 ## Related repositories
 
-- 🔓 [Civil service organisations](https://github.com/instituteforgov/cs_organisations/): Scripts for managing canonical civil service organisation data, used to augment the civil service staff numbers data with things like latest departmental groups
 - 🔓 [Civil service data utilities](https://github.com/instituteforgov/cs_data_utils/): Shared data utilities for civil service data pipelines
+- 🔓 [Civil service organisations](https://github.com/instituteforgov/cs_organisations/): Scripts for managing canonical civil service organisation data, used to augment the civil service staff numbers data with things like latest departmental groups
 
 ## Project structure
 
@@ -16,9 +16,21 @@ Scripts for managing civil service staff numbers data
 │   │   │   └── compare_data.sql
 │   │   ├── compare_data.py
 │   │   └── extract_legacy_data.py
+│   ├── params/
+│   │   └── releases.yaml
 │   ├── sql/
-│   │   └── select_data.sql
+│   │   ├── export/
+│   │   │   └── select_data.sql
+│   │   └── extract/
+│   │       ├── count_restated_by_quarter.sql
+│   │       ├── count_staff_numbers_by_quarter.sql
+│   │       └── select_organisations.sql
+│   ├── extract_data.py
 │   └── utils.py
+├── logs/
+│   └── extract_data.log
+├── params/
+│   └── releases.yaml
 ├── .gitignore
 ├── .pre-commit-config.yaml
 ├── LICENSE
@@ -32,11 +44,24 @@ Scripts for managing civil service staff numbers data
 pip install -r requirements.txt
 ```
 
+## Extracting a new release
+
+1. **Download the source file.** Download the latest ONS public sector employment release and save it to the `Source` directory (external to this repo).
+
+1. **Add an entry to `params/releases.yaml`.** Add a new entry at the end of the file with the year, quarter, source filename, sheet name and any NA values used in the file. The script always uses the last entry.
+
+1. **Run `cs_staff_numbers/extract_data.py`.** The script validates the file structure and data quality, checks for duplicate rows in the database, resolves organisation IDs, and appends the new and restated rows to `civil_service.staff_numbers`.
+
+1. **Review the output.** Check the log (`logs/extract_data.log`) for any warnings, in particular unresolved organisation names. Unresolved names will need to be added to the canonical organisation data in the [cs_organisations](https://github.com/instituteforgov/cs_organisations/) repo before re-running.
+
+1. **Refresh Excel queries.** Refresh uses of `cs_staff_numbers/sql/export/select_data.sql` in Excel working files to re-export the augmented dataset for use.
+
 ## Scripts
 
 | File | Description |
 | ---- | ----------- |
-| `cs_staff_numbers/sql/select_data.sql` | Script to be used for (re-)insertion of augmented data into Excel. Duplicates `cs_staff_numbers/legacy/sql/compare_data.sql`, with the following differences to columns: <ul><li><strong>Only one row per organisation and quarter returned</strong>: 'Restated' rows favoured, with 'Original' returned for quarters where it is not</li><li><strong>Column order changed</strong></li><li><strong>Organisation type</strong>: Reported as is</li><li><strong>IfG core department</strong>: Added</li><li><strong>Latest organisation</strong>: Latest actual organisation always reported, rather than latest determinate organisation</li><li><strong>Latest departmental group</strong>: Latest actual (IfG) departmental group always reported, rather than latest determinate organisation</li></ul> |
+| `cs_staff_numbers/extract_data.py` | Extracts data from the latest ONS PSE release file, transforms it and loads it to the research database. |
+| `cs_staff_numbers/sql/export/select_data.sql` | Script to be used for (re-)insertion of augmented data into Excel. Duplicates `cs_staff_numbers/legacy/sql/compare_data.sql`, with the following differences to columns: <ul><li><strong>Only one row per organisation and quarter returned</strong>: 'Restated' rows favoured, with 'Original' returned for quarters where it is not</li><li><strong>Column order changed</strong></li><li><strong>Organisation type</strong>: Reported as is</li><li><strong>IfG core department</strong>: Added</li><li><strong>Latest organisation</strong>: Latest actual organisation always reported, rather than latest determinate organisation</li><li><strong>Latest departmental group</strong>: Latest actual (IfG) departmental group always reported, rather than latest determinate organisation</li></ul> |
 
 ### Legacy scripts
 
