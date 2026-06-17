@@ -3,7 +3,7 @@
 -- NB: Where data exists in both 'Original' and 'Restated' form for the same organisation and quarter, the 'Restated' row is preferred
 -- NB: 'IfG core department' is recoded to 'Y'/'N' to make it more user-friendly
 -- NB: 'Organisation name' is renamed 'Organisation', so that existing PivotTable connections to collated datasets don't break
--- NB: 'IfG departmental group' is renamed 'Latest departmental group', so that existing PivotTable connections to collated datasets don't break
+-- NB: 'IfG departmental group' is renamed 'Departmental group', so that existing PivotTable connections to collated datasets don't break
 -- NB: 'Latest IfG departmental group' is renamed 'Latest departmental group', so that existing PivotTable connections to collated datasets don't break
 with sn as (
     select

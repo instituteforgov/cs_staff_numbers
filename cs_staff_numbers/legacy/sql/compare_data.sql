@@ -15,7 +15,7 @@
         -- ❌ Latest departmental group short name: 'Security services' (Excel) vs null (SQL), as we haven't set short names for things of type 'Reporting total'
     -- *No case statement needed, as things match in both cases
 -- NB: 'Organisation name' is renamed 'Organisation', so that existing PivotTable connections to collated datasets don't break
--- NB: 'IfG departmental group' is renamed 'Latest departmental group', so that existing PivotTable connections to collated datasets don't break
+-- NB: 'IfG departmental group' is renamed 'Departmental group', so that existing PivotTable connections to collated datasets don't break
 -- NB: 'Latest IfG departmental group' is renamed 'Latest departmental group', so that existing PivotTable connections to collated datasets don't break
 with sn as (
     select
