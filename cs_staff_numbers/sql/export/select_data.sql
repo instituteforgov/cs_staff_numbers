@@ -37,7 +37,7 @@ o_vicd_vodg as (
             o.id = vodg.organisation_id
 )
 select
-    sn.id,
+    sn.id ID,
     sn.year Year,
     sn.quarter Quarter,
     sn.organisation_name Organisation,
