@@ -78,6 +78,7 @@ EXPECTED_LAST_ORG = "Total employment"
 FIRST_DATA_ROW = 5
 
 # Data cleaning
+ORG_NAME_NOTE_PATTERN = r"\s*\d+$"
 ORG_NAME_REPLACEMENTS = params["org_name_replacements"]
 ORG_NAME_REMOVE_STRINGS = [
     "(excluding agencies)",
@@ -146,7 +147,10 @@ for col_pair, label in [(NEW_HEADCOUNT_COL, "new"), (PREV_HEADCOUNT_COL, "previo
 # Data rows: org name present and headcount value present in new quarter column.
 # This excludes group-header rows (headcount col null) and blank separator rows (org name col null).
 df_data = df_raw[df_raw[ORG_NAME_COL].notna() & df_raw[NEW_HEADCOUNT_COL].notna()].copy()
-df_data["organisation_name"] = df_data[ORG_NAME_COL].astype(str).str.strip().str.replace(r"\s*-\s*\d{4}\s*iteration\s*", "", regex=True)
+df_data["organisation_name"] = df_data[ORG_NAME_COL].astype(str).str.strip()
+
+# Remove note numbers from org names
+df_data["organisation_name"] = df_data["organisation_name"].str.replace(ORG_NAME_NOTE_PATTERN, "", regex=True).str.strip()
 
 # Check first and last data rows
 assert df_data.index[0] >= FIRST_DATA_ROW, f"First data row found at unexpected position (raw row {df_data.index[0] + 1})"
