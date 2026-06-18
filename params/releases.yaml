@@ -3,3 +3,6 @@
   source_file: ONS PSE 2026 Q1.xlsx
   sheet_name: Table 9
   na_values: [".."]
+  org_name_replacements:
+    "Medicines and Healthcare Products Regulatory Agency": "Medicines and Healthcare products Regulatory Agency"
+    "Ministry of Housing, Communities and Local Government": "Ministry of Housing, Communities & Local Government"

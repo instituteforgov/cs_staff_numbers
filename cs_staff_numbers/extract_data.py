@@ -30,6 +30,8 @@
             - Data quality
                 - No unused NA values
                 - No organisation rows with both headcount and FTE null
+                - All keys in ORG_NAME_REPLACEMENTS appear in at least one organisation name
+                - All strings in ORG_NAME_REMOVE_STRINGS appear in at least one organisation name
             - Before appending
                 - No existing 'Restated' rows in the database for the previous quarter
                 - No existing rows in the database for the new quarter
@@ -74,6 +76,14 @@ EXPECTED_COL_HEADERS = ["Headcount", "Full Time Equivalent"]
 EXPECTED_FIRST_GROUP = "Attorney General's departments"
 EXPECTED_LAST_ORG = "Total employment"
 FIRST_DATA_ROW = 5
+
+# Data cleaning
+ORG_NAME_REPLACEMENTS = params["org_name_replacements"]
+ORG_NAME_REMOVE_STRINGS = [
+    "(excluding agencies)",
+    "(incl. Office of the Advocate General for Scotland)",
+    "(excluding trading funds)",
+]
 
 # %%
 # CONFIGURE LOGGING
@@ -142,6 +152,20 @@ df_data["organisation_name"] = df_data[ORG_NAME_COL].astype(str).str.strip().str
 assert df_data.index[0] >= FIRST_DATA_ROW, f"First data row found at unexpected position (raw row {df_data.index[0] + 1})"
 last_org = df_data.iloc[-1]["organisation_name"]
 assert last_org == EXPECTED_LAST_ORG, f"Last data row is not '{EXPECTED_LAST_ORG}': '{last_org}'"
+
+# Check all replacement keys and remove strings are present in the data
+_org_names = df_data["organisation_name"].tolist()
+_missing_replacements = [k for k in ORG_NAME_REPLACEMENTS if not any(k in name for name in _org_names)]
+assert not _missing_replacements, f"ORG_NAME_REPLACEMENTS keys not found in any organisation name: {_missing_replacements}"
+_missing_remove_strings = [s for s in ORG_NAME_REMOVE_STRINGS if not any(s in name for name in _org_names)]
+assert not _missing_remove_strings, f"ORG_NAME_REMOVE_STRINGS entries not found in any organisation name: {_missing_remove_strings}"
+
+# Clean org names
+for remove_str in ORG_NAME_REMOVE_STRINGS:
+    df_data["organisation_name"] = df_data["organisation_name"].str.replace(remove_str, "", regex=False).str.strip()
+
+for old_name, new_name in ORG_NAME_REPLACEMENTS.items():
+    df_data["organisation_name"] = df_data["organisation_name"].str.replace(old_name, new_name, regex=False).str.strip()
 
 # New quarter
 df_new = df_data[["organisation_name", NEW_HEADCOUNT_COL, NEW_FTE_COL]].copy()
