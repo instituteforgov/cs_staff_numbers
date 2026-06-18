@@ -1,5 +1,5 @@
 select
-    count(sn.*)
+    count(*)
 from civil_service.staff_numbers sn
 where
     sn.year = :year and
