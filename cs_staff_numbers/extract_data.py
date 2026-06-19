@@ -59,8 +59,8 @@ with open("params/releases.yaml", encoding="utf-8") as f:
 SOURCE_DIR = "C:/Users/" + os.getlogin() + "/INSTITUTE FOR GOVERNMENT/Data - General/Civil service/Civil service - staff numbers (FTE and headcount)/Source"
 SOURCE_FILE = params["source_file"]
 SHEET_NAME = params["sheet_name"]
+EXPECTED_TITLE = params["expected_title"]
 NA_VALUES = params["na_values"]
-EXPECTED_TITLE = "Table 9: Civil Service employment by department and agency"
 EXPECTED_YEAR = params["year"]
 EXPECTED_QUARTER = params["quarter"]
 
