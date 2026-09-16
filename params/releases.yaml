@@ -2,7 +2,16 @@
   quarter: 1
   source_file: ONS PSE 2026 Q1.xlsx
   sheet_name: Table 9
-  expected_title: Civil Service employment by department and agency
+  expected_title: "Table 9: Civil Service employment by department and agency"
+  na_values: [".."]
+  org_name_replacements:
+    "Medicines and Healthcare Products Regulatory Agency": "Medicines and Healthcare products Regulatory Agency"
+    "Ministry of Housing, Communities and Local Government": "Ministry of Housing, Communities & Local Government"
+- year: 2026
+  quarter: 2
+  source_file: ONS PSE 2026 Q2.xlsx
+  sheet_name: Table 9
+  expected_title: "Table 9: Civil Service employment by department and agency"
   na_values: [".."]
   org_name_replacements:
     "Medicines and Healthcare Products Regulatory Agency": "Medicines and Healthcare products Regulatory Agency"
