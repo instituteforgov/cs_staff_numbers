@@ -78,7 +78,7 @@ EXPECTED_LAST_ORG = "Total employment"
 FIRST_DATA_ROW = 5
 
 # Data cleaning
-ORG_NAME_NOTE_PATTERN = r"\s*\d+$"
+ORG_NAME_NOTE_PATTERN = r"(\s*\d+)+$"
 ORG_NAME_REPLACEMENTS = params["org_name_replacements"]
 ORG_NAME_REMOVE_STRINGS = [
     "(excluding agencies)",
