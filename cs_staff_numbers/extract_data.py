@@ -11,6 +11,8 @@
             - Counts existing rows for the new quarter (duplicate check)
         - sql: cs_staff_numbers/sql/extract/count_restated_by_quarter.sql
             - Counts existing restated rows for the previous quarter (duplicate check)
+        - sql: cs_staff_numbers/sql/extract/select_name_changes.sql
+            - Name change events (civil_service.organisation_link/organisation_link_event) effective from the new release quarter
         - sql: cs_staff_numbers/sql/extract/select_organisations.sql
             - Canonical civil service organisation details
     Outputs
@@ -19,6 +21,8 @@
     Notes
         - New data is appended to the database table, rather than existing rows being modified
         - Run parameters are loaded from cs_staff_numbers/params/releases.yaml (last entry used)
+        - Org x quarter rows with both headcount and FTE equal to 0 (e.g. bodies abolished/merged as of that quarter) are dropped before appending
+        - Where an organisation is renamed as of the new release quarter, ONS reports the previous quarter under the new name; restated rows are recoded back to the pre-rename organisation name so they resolve to the same organisation as the existing 'Original' row rather than being treated as a different organisation
         - Carries out the following checks on data:
             - Structure
                 - Sheet title starts with EXPECTED_TITLE
@@ -194,6 +198,17 @@ used_na_values = {v for v in NA_VALUES if (df_raw_str == v).any().any()}
 unused_na_values = [v for v in NA_VALUES if v not in used_na_values]
 assert not unused_na_values, f"Unused NA values (remove from NA_VALUES): {unused_na_values}"
 
+# Drop org x quarter rows with zero headcount and FTE (e.g. bodies abolished/merged as of that quarter)
+mask_new_zero = (df_new["headcount"] == 0) & (df_new["fte"] == 0)
+if mask_new_zero.any():
+    logger.info("Dropping %s new quarter row(s) with zero headcount and FTE:\n  %s", mask_new_zero.sum(), "\n  ".join(df_new.loc[mask_new_zero, "organisation_name"]))
+    df_new = df_new[~mask_new_zero].reset_index(drop=True)
+
+mask_restated_zero = (df_restated["headcount"] == 0) & (df_restated["fte"] == 0)
+if mask_restated_zero.any():
+    logger.info("Dropping %s restated row(s) with zero headcount and FTE:\n  %s", mask_restated_zero.sum(), "\n  ".join(df_restated.loc[mask_restated_zero, "organisation_name"]))
+    df_restated = df_restated[~mask_restated_zero].reset_index(drop=True)
+
 # Check for org rows where both headcount and FTE are null
 df_null = df_new[df_new["headcount"].isna() & df_new["fte"].isna()]
 assert len(df_null) == 0, f"{len(df_null)} rows with no headcount or FTE:\n{df_null['organisation_name'].to_string()}"
@@ -223,6 +238,26 @@ assert n_existing_restated == 0, (
 )
 
 logger.info("Duplicate check passed — no existing rows for %s Q%s and no restated rows for %s Q%s", new_year, new_quarter, prev_year, prev_quarter)
+
+# %%
+# RECODE RENAMED ORGANISATIONS
+# ONS reports the previous quarter under an organisation's new name where it has been renamed as of the new quarter; recode these restated rows back to the pre-rename name so they resolve to the same organisation as the existing 'Original' row
+df_name_changes = pd.read_sql(
+    text(sql("select_name_changes.sql")),
+    engine,
+    params={"year": new_year, "quarter": new_quarter},
+)
+rename_map = dict(zip(df_name_changes["successor_name"], df_name_changes["predecessor_name"]))
+if rename_map:
+    mask_renamed = df_restated["organisation_name"].isin(rename_map)
+    logger.info(
+        "Recoding %s 'Restated' row(s) for %s Q%s to pre-rename organisation name(s):\n  %s",
+        mask_renamed.sum(),
+        prev_year,
+        prev_quarter,
+        "\n  ".join(f"{new_name} -> {old_name}" for new_name, old_name in rename_map.items()),
+    )
+    df_restated["organisation_name"] = df_restated["organisation_name"].replace(rename_map)
 
 # %%
 # RESOLVE ORG IDs
