@@ -263,7 +263,6 @@ if rename_map:
 # RESOLVE ORG IDs
 df_organisation = pd.read_sql(sql("select_organisations.sql"), engine)
 
-
 df_new = add_ids(df_new, df_organisation, new_quarter)
 df_restated = add_ids(df_restated, df_organisation, prev_quarter)
 
